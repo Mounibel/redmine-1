@@ -20,7 +20,7 @@ services:
     volumes:
       - redmine-data:/usr/src/redmine/files
     ports:
-      - 3030:3000
+      - 80:3000
     environment:
       - 'REDMINE_DB_POSTGRES=postgres'
       - 'REDMINE_DB_DATABASE=redmine'
