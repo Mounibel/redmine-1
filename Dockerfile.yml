@@ -1,18 +1,5 @@
-# Utilisez une image de base contenant Apache et PHP
-FROM php:apache
+FROM redmine:latest
 
-# Copiez le contenu de l'application Redmine dans le répertoire web d'Apache
-COPY . /var/www/html/
+# Copiez les fichiers de votre application Redmine dans le répertoire de travail d'Apache2
+COPY . /usr/src/redmine/public/
 
-# Exposez le port 80 pour accéder à l'application via HTTP
-EXPOSE 80
-
-# Indiquez à Apache de rediriger toutes les requêtes vers l'index.php
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-# Exécutez Apache en premier plan
-CMD ["apache2-foreground"]
-
-# Commande de démarrage de l'application
-CMD ["rails", "server", "-b", "0.0.0.0"]
