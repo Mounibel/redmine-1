@@ -1,5 +1,7 @@
+# Utilisez l'image officielle de Redmine avec Apache2
 FROM redmine:latest
 
 # Copiez les fichiers de votre application Redmine dans le répertoire de travail d'Apache2
 COPY . /usr/src/redmine/public/
+
 
