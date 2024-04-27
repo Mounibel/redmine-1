@@ -27,7 +27,7 @@ ENV RAILS_ENV=production \
     REDMINE_DB_PASSWORD=password \
     REDMINE_SECRET_KEY_BASE=secret \
     REDMINE_HTTPS=false \
-    REDMINE_PORT=3030
+    REDMINE_PORT=80
 
 # Précompilation des assets de Redmine
 RUN bundle exec rake generate_secret_token \
@@ -38,7 +38,7 @@ RUN bundle exec rake generate_secret_token \
  && bundle exec rake assets:precompile
 
 # Exposition du port 3030
-EXPOSE 3030
+EXPOSE 80
 
 # Commande de démarrage de l'application
 CMD ["rails", "server", "-b", "0.0.0.0"]
