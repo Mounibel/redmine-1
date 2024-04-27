@@ -1,44 +1,18 @@
-FROM ruby:2.7
+# Utilisez une image de base contenant Apache et PHP
+FROM php:apache
 
-# Installation des dépendances système
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    apt-utils \
-    build-essential \
-    libmariadb-dev-compat \
-    libmagickwand-dev \
-    nodejs \
- && rm -rf /var/lib/apt/lists/*
+# Copiez le contenu de l'application Redmine dans le répertoire web d'Apache
+COPY . /var/www/html/
 
-# Configuration de Bundler pour exclure les groupes development et test
-RUN bundle config set without 'development test'
-
-# Définition du répertoire de travail
-WORKDIR /usr/src/redmine
-
-# Copie des fichiers de l'application dans l'image Docker
-COPY . .
-
-# Installation des gems
-RUN bundle install
-
-# Définition des variables d'environnement
-ENV RAILS_ENV=production \
-    REDMINE_DB_MYSQL=1 \
-    REDMINE_DB_PASSWORD=password \
-    REDMINE_SECRET_KEY_BASE=secret \
-    REDMINE_HTTPS=false \
-    REDMINE_PORT=80
-
-# Précompilation des assets de Redmine
-RUN bundle exec rake generate_secret_token \
- && bundle exec rake db:migrate \
- && bundle exec rake redmine:plugins \
- && bundle exec rake tmp:cache:clear \
- && bundle exec rake tmp:sessions:clear \
- && bundle exec rake assets:precompile
-
-# Exposition du port 3030
+# Exposez le port 80 pour accéder à l'application via HTTP
 EXPOSE 80
+
+# Indiquez à Apache de rediriger toutes les requêtes vers l'index.php
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Exécutez Apache en premier plan
+CMD ["apache2-foreground"]
 
 # Commande de démarrage de l'application
 CMD ["rails", "server", "-b", "0.0.0.0"]
